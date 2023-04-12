@@ -3,6 +3,9 @@ import json
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
+import openai
+from django.conf import settings
+
 
 
 class ChatConsumer(WebsocketConsumer):
@@ -38,4 +41,22 @@ class ChatConsumer(WebsocketConsumer):
         message = event["message"]
 
         # Send message to WebSocket
-        self.send(text_data=json.dumps({"message": message}))
+        openai.api_key = settings.OPENAI_API_KEY
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt= generate_prompt(message),
+            temperature=0.5,
+            max_tokens=60,
+            top_p=1.0,
+            frequency_penalty=0.5,
+            presence_penalty=0.0,
+            stop=["You:"]
+        )
+        self.send(text_data=json.dumps({"message": response.choices[0].text}))
+
+
+def generate_prompt(msg):
+    return "You: {}\n\
+            Friend:".format(msg)
+            # Friend: Watching old movies.\n\
+            # You: Did you watch anything interesting?\n\

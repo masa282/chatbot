@@ -18,6 +18,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('chat/', include("chat.urls")),
+    path('', include("chat.urls")),
+    path('', include("accounts.urls")),
     #path('synchronize/', )
 ]

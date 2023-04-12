@@ -1,4 +1,6 @@
 __pycache__
 db.sqlite3
-config.yml
+specification.yml
 venv*
+migrations
+tmp
