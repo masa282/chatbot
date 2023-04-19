@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block contents %}
+<div class="container-fluid" style="color:black;">
+<div style="text-align: center;">
+    <h2>Which language would you like to talk?</h2><br>
+</div>
+<div class="d-flex justify-content-center align-items-center" style="flex-direction:row;text-align:center;font-size:30px;">
+    <div class="d-flex flex-column justify-content-center align-items-center" style="flex-direction:column;width:100%; border-right: 1px solid grey;">
+        <div class="radio mb-3">
+            <input type="radio" name="lang" value="en" checked="checked"> US English 
+        </div>
+        <div class="radio">
+            <input type="radio" name="lang" value="es"> Spanish
+        </div>
+    </div>
+    <div class="d-flex flex-column justify-content-center align-items-center" style="flex-direction:column;width:100%;">
+        <div class="radio mb-3">
+            <input type="radio" name="style" value="b" checked="checked">Business
+        </div>
+        <div class="radio">
+            <input type="radio" name="style" value="c"> Casual
+        </div>
+    </div>
+</div>
+<div style="text-align:center; margin-top:50px;">
+    <input id="room-name-submit" type="button" class="btn btn-lg btn-primary"value="Enter">
+</div>
+</div>
+
+<!-- {{ room_name|json_script:"room-name" }} -->
+{% endblock %}
+
+{% block script %}
+<script>
+    // document.querySelector('#room-name-input').focus();
+    // document.querySelector('#room-name-input').onkeyup = function(e) {
+    //     if (e.keyCode === 13) {  // enter, return
+    //         document.querySelector('#room-name-submit').click();
+    //     }
+    // };
+
+    //document.cookie.replace(/(?:(?:^|.*;\s*)lang\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+    //const roomName = JSON.parse(document.getElementById('room-name').textContent);
+    const cookies = document.cookie;
+    console.log(cookies);
+
+    function completeLanguageTag(langCode) {
+        const langCodes = {
+            "en": "en-US",
+            "es": "es-ES",
+        };    
+        if (langCodes.hasOwnProperty(langCode)) {
+        return langCodes[langCode];
+        } else {
+            return "en-US";
+        };
+    };
+
+    document.querySelector('#room-name-submit').onclick = function(e) {
+        //var roomName = document.querySelector('#room-name-input').value;
+        let lang = document.querySelector('[name=lang]:checked').value;
+        if (cookies.length !== 0){
+            let cookiesObj = {};
+            cookies.split(';').forEach(function(cookie) {
+                var parts = cookie.split('=');
+                cookiesObj[parts[0].trim()] = parts[1].trim();//(parts[1] || '').trim();
+            });
+            cookieObj = JSON.parse(JSON.stringify(cookiesObj))
+            let compLang = completeLanguageTag(lang);
+            if (cookieObj.hasOwnProperty(compLang)){
+                let chat_id = cookieObj[compLang];
+                if (chat_id.length!==0){
+                    window.location.pathname = '/chat/' + lang + '/' + chat_id + '/';
+                }else{
+                    window.location.pathname = '/chat/' + lang + '/';    
+                }
+            }
+            else{
+                window.location.pathname = '/chat/' + lang + '/';
+            }
+        }else{
+            window.location.pathname = '/chat/' + lang + '/';
+        }
+    };
+</script>
+{% endblock %}

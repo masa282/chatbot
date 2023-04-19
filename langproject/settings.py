@@ -68,6 +68,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'builtins':[
+                'chat.templatetags.filter',
+            ]
         },
     },
 ]
@@ -128,6 +131,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+# ADD
 ASGI_APPLICATION = "langproject.asgi.application"
 
 CHANNEL_LAYERS = {
@@ -141,3 +145,17 @@ CHANNEL_LAYERS = {
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 AUTH_USER_MODEL = "accounts.CustomUser"
+LOGOUT_REDIRECT_URL = "chat:index"
+LOGIN_REDIRECT_URL = "chat:lobby"
+#DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+#DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join(BASE_DIR, 'backups')}
+
+CHAT_SESSION_ID = 'chat'
+
+RANDOM_DIGIT = 12
+
+SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+# SESSION_COOKIE_NAME = 'chat_id'
+SESSION_COOKIE_HTTPONLY = False  # HTTPOnly属性を設定しない
+#SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'Lax'

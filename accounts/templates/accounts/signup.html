@@ -1,30 +1,48 @@
+{% extends 'base.html' %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Sign Up</title>
-    <link rel="stylesheet" href="{% static 'accounts/css/signup.css' %}">
-</head>
-<body>
-    <div class="signup-form">
-        <h2>Sign Up</h2>
-        <form>
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" required>
+{% block title %}Sign Up{% endblock %}
 
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" required>
+{% block head %}
+<link rel="stylesheet" href="{% static 'accounts/css/signup.css' %}">
+{% endblock %}
 
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
+{% block contents %}
+<div class="signup-form">
+    <h2>Sign Up</h2>
+    <form method="post">
+        {% csrf_token %}
+        
+        {{ form.username.label_tag }}
+        {{ form.username }}
+        {% for error in form.username.errors %}
+            <small style="color: red">{{ error }}</small>
+        {% endfor %}
+        
+        {{ form.email.label_tag }}
+        {{ form.email }}
+        {% for error in form.email.errors %}
+            <small style="color: red">{{ error }}</small>
+        {% endfor %}
 
-            <label for="confirm-password">Confirm Password</label>
-            <input type="password" id="confirm-password" name="confirm-password" required>
+        {{ form.password1.label_tag }}
+        {{ form.password1 }}
+        {% for error in form.password1.errors %}
+            <small style="color: red">{{ error }}</small>
+        {% endfor %}
 
-            <button type="submit">Sign Up</button>
-        </form>
-    </div>
-</body>
-</html>
+        {{ form.password2.label_tag }}
+        {{ form.password2 }}
+        {% for error in form.password2.errors %}
+            <small style="color: red">{{ error }}</small>
+        {% endfor %}
+
+        <button type="submit">Sign Up</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'accounts/js/signup.js' %}"></script>
+{% endblock %}
