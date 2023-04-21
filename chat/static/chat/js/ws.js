@@ -48,12 +48,14 @@ document.querySelector('#chat-message-input').onkeyup = function(e) {
 document.querySelector('#chat-message-submit').onclick = function(e) {
     const messageInputDom = document.querySelector('#chat-message-input');
     const message = messageInputDom.value;
-    chatSocket.send(JSON.stringify({
-        'message': message
-    }));
-    messageInputDom.value = '';
-    // add msg to chat log
-    add_chat_log(message, "human");
+    if (message.length > 0){
+        chatSocket.send(JSON.stringify({
+            'message': message
+        }));
+        messageInputDom.value = '';
+        // add msg to chat log
+        add_chat_log(message, "human");
+    }
 };
 
 
@@ -91,15 +93,16 @@ function add_chat_log (msg, speaker){
         icon_img.src = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" 
         msg_container.classList.add("justify-content-start");
         p_msg.classList.add("ms-3");
-        p_msg.style.backgroundColor = "#f5f6f7";
+        p_msg.style.backgroundColor = "#EAEAEA";
         p_time.classList.add("ms-3");
         p_time.classList.add("float-end");
     } else if (speaker == "AI"){
         icon_img.src = "https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp";
         msg_container.classList.add("justify-content-end");
         p_msg.classList.add("me-3");
-        p_msg.classList.add("bg-primary");
+        //p_msg.classList.add("bg-primary");
         p_time.classList.add("me-3");
+        p_msg.style.backgroundColor = "#4EA1D5";
     }
 
     div2.appendChild(p_msg);

@@ -132,6 +132,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # ADD
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+
 ASGI_APPLICATION = "langproject.asgi.application"
 
 CHANNEL_LAYERS = {

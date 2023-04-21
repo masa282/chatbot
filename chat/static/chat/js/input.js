@@ -6,7 +6,7 @@ const recognition = new SpeechRecognition();
 recognition.interimResults = true;
 recognition.maxAlternatives = 1;
 const speechIcon = document.querySelector("#speech-icon");
-
+const micColor = {on:"red", off:"#4EA1D5"};
 
 function completeLanguageTag(langCode) {
     const langCodes = {
@@ -23,10 +23,9 @@ function completeLanguageTag(langCode) {
 
 document.querySelector('#speech-input-btn').addEventListener('click', () => {
     let lang= completeLanguageTag(JSON.parse(document.getElementById('lang').textContent));
-    speechIcon.style.fill = "green";
+    speechIcon.style.fill = micColor.on;
     //let recogLang = document.querySelector('[name=lang]:checked');
     recognition.lang = lang; //recogLang.value;
-
     recognition.start();
 });
 
@@ -44,7 +43,7 @@ recognition.addEventListener('result', (e) => {
 });
 
 recognition.addEventListener('speechend', () => {
-    speechIcon.style.fill = "red";
+    speechIcon.style.fill = micColor.off;
     recognition.stop();
 });
 
