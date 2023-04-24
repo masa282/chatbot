@@ -57,6 +57,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
+        response_type = text_data_json["response_type"]
         message = text_data_json["message"]
 
         # Send message to room group
@@ -64,12 +65,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             {
                 "type": "chat.message",
+                "response_type": response_type,
                 "message": message
             }
         )
 
     # Receive message from room group
     async def chat_message(self, event):
+        response_type = event["response_type"]
         message = event["message"]
         chat_id = ""
 
@@ -79,46 +82,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.scope["session"][self.lang] = str(chat_id)
             self.scope["session"].save()
             self.chat_id = chat_id
-            print("[+]set chat id: ", str(chat_id))
             
             #chat_session = CHATSESSION(self.scope["session"])
             #chat_session.set(str(chat_id))
 
-        if not self.current_user.is_anonymous:
-            await self.__class__.save_message(self.chat_id, self.current_user, message)
-
         # Send message to WebSocket
-        openai.api_key = settings.OPENAI_API_KEY
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt= self.generate_prompt(message),
-            temperature=0.5,
-            max_tokens=60,
-            top_p=1.0,
-            frequency_penalty=0.5,
-            presence_penalty=0.0,
-            stop=["You:"]
-        )
-        response_message = response.choices[0].text
+        response_message = self.create_response(response_type, message)
 
         if not self.current_user.is_anonymous:
-            await self.__class__.save_message(self.chat_id, None, response_message)
+            if response_type == "chat":
+                await self.__class__.save_message(self.chat_id, self.current_user, message)
+                await self.__class__.save_message(self.chat_id, None, response_message)
 
-        await self.send(text_data = json.dumps({"message": response_message,
+        await self.send(text_data = json.dumps({"response_type": response_type,
+                                                "message": response_message,
                                                 "chat_id": str(chat_id)}))
-
-    def generate_prompt(self, msg):
-        return "You: {}\n\
-                Friend:".format(msg)
-                # Friend: Watching old movies.\n\
-                # You: Did you watch anything interesting?\n\
-    
-    def get_user(self, scope):
-        if "user" in scope:
-            return scope["user"]
-        else:
-            return AnonymousUser
-        
+       
     @classmethod
     @database_sync_to_async
     def save_message(cls, chat_id, user, msg):
@@ -136,3 +115,53 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def create_chatroom_record(cls, user, lang):
         new_chat = Chat.objects.create(user1=user, lang=lang)
         return new_chat.chat_id
+
+    def get_user(self, scope):
+        if "user" in scope:
+            return scope["user"]
+        else:
+            return AnonymousUser
+        
+    def create_response(self, type, msg):
+        openai.api_key = settings.OPENAI_API_KEY
+        """
+        validate text input
+        """ 
+        if type == "chat":
+            response = openai.Completion.create(
+                model="text-davinci-003",
+                prompt= generate_prompt_chat(msg),
+                temperature=0.5,
+                max_tokens=60,
+                top_p=1.0,
+                frequency_penalty=0.5,
+                presence_penalty=0.0,
+                stop=["You:"]
+            )
+            return response.choices[0].text
+        elif type=="analyze":
+            response = openai.Completion.create(
+                model="text-davinci-003",
+                prompt= generate_prompt_analyze(msg),
+                temperature=0,
+                max_tokens=60,
+                top_p=1.0,
+                frequency_penalty=0.0,
+                presence_penalty=0.0
+            )
+            return response.choices[0].text
+        else:
+            response = None
+
+        return response
+
+
+def generate_prompt_chat(msg):
+    return "You:{}\n\
+            Friend:".format(msg)
+            # Friend: Watching old movies.\n\
+            # You: Did you watch anything interesting?\n\
+
+
+def generate_prompt_analyze(msg):
+    return "Correct this to old English:{}".format(msg)
