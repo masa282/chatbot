@@ -1,8 +1,25 @@
 'use strict';
 const log = document.querySelector('.output_log');
 const output = document.querySelector('#chat-message-input');
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-const recognition = new SpeechRecognition();
+// const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+// const recognition = new SpeechRecognition();
+
+var recognition;
+
+if ('webkitSpeechRecognition' in window) {
+    // Safari
+    recognition = new webkitSpeechRecognition();
+} else if ('mozSpeechRecognition' in window) {
+    // Firefox
+    recognition = new mozSpeechRecognition();
+} else if ('SpeechRecognition' in window) {
+    // Chrome
+    recognition = new SpeechRecognition();
+} else {
+    // Not supported
+    console.log('Web Speech API is not supported.');
+}
+
 recognition.interimResults = true;
 recognition.maxAlternatives = 1;
 const speechIcon = document.querySelector("#speech-icon");

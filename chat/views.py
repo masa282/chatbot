@@ -35,7 +35,7 @@ def new_room(request, lang):
         chats = Chat.objects.filter(user1=user).order_by('-created_at') # .exclude(chat_id=now)
         massages = []
         for chat in chats:
-            msg = Message.objects.filter(chat=chat).latest('created_at')
+            msg = Message.objects.filter(chat=chat).last()#.latest('created_at')
             massages.append(msg)
         context["friends_log"] = zip(chats, massages)
 
@@ -59,7 +59,7 @@ def room(request, lang, chat_id):
         chats = Chat.objects.filter(user1=user).exclude(chat_id=chat_id).order_by('-created_at')
         massages = []
         for chat in chats:
-            msg = Message.objects.filter(chat=chat).latest('created_at')
+            msg = Message.objects.filter(chat=chat).last() #latest('created_at'), chatルームがあるのにmsgがない場合ができてしまった場合、エラーになる
             massages.append(msg)
 
         # get message log

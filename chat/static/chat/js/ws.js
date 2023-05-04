@@ -68,6 +68,7 @@ function synthVoice(text, lang) {
     const utterance = new SpeechSynthesisUtterance();
     utterance.lang = lang;
     utterance.text = text;
+    console.log(utterance);
     synth.speak(utterance);
 };
 
